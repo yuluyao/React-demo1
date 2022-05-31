@@ -3,20 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 
 
-// class Square extends React.Component {
-//
-//   render() {
-//     return (
-//       <button
-//         className="square"
-//         onClick={() => this.props.onClick()}
-//       >
-//         {this.props.value}
-//       </button>
-//     );
-//   }
-// }
-
 function Square(props) {
   return (
     <button className="square" onClick={props.play}>
@@ -25,16 +11,45 @@ function Square(props) {
   );
 }
 
-class Board extends React.Component {
+function Board(props) {
+  const renderSq = (i) => (
+    <Square
+      value={props.squares[i]}
+      play={() => props.play(i)}
+    />
+  );
+  return (
+    <div>
+      <div className="board-row">
+        {renderSq(0)}
+        {renderSq(1)}
+        {renderSq(2)}
+      </div>
+      <div className="board-row">
+        {renderSq(3)}
+        {renderSq(4)}
+        {renderSq(5)}
+      </div>
+      <div className="board-row">
+        {renderSq(6)}
+        {renderSq(7)}
+        {renderSq(8)}
+      </div>
+    </div>
+  );
+}
 
-  constructor(props, context) {
-    super(props, context);
+class Game extends React.Component {
+
+  constructor(props) {
+    super(props);
     this.state = {
       squares: Array(9).fill(null),
       xIsNext: true,
     };
   }
 
+  // 回调函数，改变状态
   onPlayStep(i) {
     const squares = this.state.squares.slice();
     if (this.calculateWinner(squares) || squares[i]) {
@@ -67,15 +82,6 @@ class Board extends React.Component {
     return null
   }
 
-  renderSquare(i) {
-    return (
-      <Square
-        value={this.state.squares[i]}
-        play={() => this.onPlayStep(i)}
-      />
-    );
-  }
-
   render() {
     const winner = this.calculateWinner(this.state.squares);
     let status;
@@ -84,39 +90,17 @@ class Board extends React.Component {
     } else {
       status = `Next player: ${this.state.xIsNext ? 'X' : 'O'}`;
     }
-
-    return (
-      <div>
-        <div className="status">{status}</div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
-      </div>
-    );
-  }
-}
-
-class Game extends React.Component {
-  render() {
     return (
       <div className="game">
         <div className="game-board">
-          <Board/>
+          {/*<div className="status">{status}</div>*/}
+          <Board
+            squares={this.state.squares}
+            play={(i) => this.onPlayStep(i)}
+          />
         </div>
         <div className="game-info">
-          <div>{/* status */}</div>
+          <div>{status}</div>
           <ol>{/* TODO */}</ol>
         </div>
       </div>
