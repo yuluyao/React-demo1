@@ -44,13 +44,14 @@ class Game extends React.Component {
           squares: Array(9).fill(null),
         },
       ],
+      stepIndex: 0,
       xIsNext: true,
     };
   }
 
   // 点击回调函数，改变状态
   onPlayStep(i) {
-    const history = this.state.history;
+    const history = this.state.history.slice(0, this.state.stepIndex + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     if (this.calculateWinner(squares) || squares[i]) {
@@ -63,7 +64,15 @@ class Game extends React.Component {
           squares: squares,
         },
       ]),
+      stepIndex: history.length,
       xIsNext: !this.state.xIsNext,
+    });
+  }
+
+  jumpTo(index) {
+    this.setState({
+      stepIndex: index,
+      xIsNext: index % 2 === 0,
     });
   }
 
@@ -93,8 +102,18 @@ class Game extends React.Component {
 
   render() {
     const history = this.state.history;
-    const current = history[history.length - 1];
+    const current = history[this.state.stepIndex];
     const winner = this.calculateWinner(current.squares);
+
+    const moves = history.map((squares, step) => {
+      const desc = step ? "go to step #" + step : "go to game start";
+      return (
+        <li key={step}>
+          <button onClick={() => this.jumpTo(step)}>{desc}</button>
+        </li>
+      );
+    });
+
     let status;
     if (winner) {
       status = `Winner: ${winner}`;
@@ -109,7 +128,7 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{/* TODO */}</ol>
+          <ol>{moves}</ol>
         </div>
       </div>
     );
